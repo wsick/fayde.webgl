@@ -1,0 +1,31 @@
+{
+  "name": "fayde.webgl",
+  "client": {
+    "tests": [
+      {
+        "file": "test/fayde.json",
+        "lib": "test/lib",
+        "exclude": [
+          "qunit"
+        ]
+      },
+      {
+        "file": "testsite/fayde.json",
+        "lib": "testsite/lib",
+        "exclude": [
+          "qunit"
+        ]
+      }
+    ]
+  },
+  "type": "lib",
+  "dist": "dist/fayde.webgl",
+  "library": {
+    "type": "export",
+    "exports": "Fayde.WebGL"
+  },
+  "themes": {},
+  "typings": [
+    "dist/fayde.webgl.d.ts"
+  ]
+}

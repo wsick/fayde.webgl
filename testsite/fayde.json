@@ -1,0 +1,15 @@
+{
+  "libs": {
+    "fayde.webgl": {
+      "exports": "Fayde.WebGL",
+      "base": "lib/fayde.webgl"
+    }
+  },
+  "themes": {
+    "fayde.webgl": {}
+  },
+  "debug": {
+    "warnMissingThemes": false,
+    "warnBrokenPath": false
+  }
+}

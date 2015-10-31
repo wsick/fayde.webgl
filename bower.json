@@ -1,0 +1,17 @@
+{
+  "name": "fayde.webgl",
+  "version": "0.1.0",
+  "ignore": [
+    "gulp",
+    "test",
+    "testsite",
+    "typings",
+    "gulpfile.js"
+  ],
+  "dependencies": {
+    "fayde": "~0.19.6"
+  },
+  "devDependencies": {
+    "qunit": "~1.20.0"
+  }
+}
