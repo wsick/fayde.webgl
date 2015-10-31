@@ -1,5 +1,5 @@
-import basicFragment = require('text!./shaders/basic-fragment.shader');
-import basicVertex = require('text!./shaders/basic-vertex.shader');
+import basicFragment = require('text!../shaders/basic-fragment.shader');
+import basicVertex = require('text!../shaders/basic-vertex.shader');
 
 // Built from tutorial:
 //  https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL

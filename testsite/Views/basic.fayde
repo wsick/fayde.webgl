@@ -1,8 +1,13 @@
 <Page xmlns="http://schemas.wsick.com/fayde"
       xmlns:x="http://schemas.wsick.com/fayde/x"
-      xmlns:mylib="lib://fayde.webgl"
+      xmlns:webgl="lib://fayde.webgl"
+      xmlns:vms="ViewModels"
       Title="Test 1">
-    <StackPanel Margin="5">
-
-    </StackPanel>
+    <Grid x:Name="LayoutRoot">
+        <Grid.DataContext>
+            <vms:BasicViewModel/>
+        </Grid.DataContext>
+        <webgl:WebGLCanvas Width="640" Height="480" Draw="{EventBinding onDraw}">
+        </webgl:WebGLCanvas>
+    </Grid>
 </Page>
