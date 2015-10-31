@@ -10,6 +10,13 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
     private $vertexcolorattr: number;
     private $squarevertbuffer: WebGLBuffer;
     private $squarecolorbuffer: WebGLBuffer;
+    private $xstack: Float32Array[] = [];
+
+    private $squarepos = vec4.init(0, 0, 0, 0);
+    private $squarevel = vec4.init(0.2, -0.4, 0.3, 0);
+    private $squarerot = 0.0;
+
+    private $last: number = 0;
 
     onDraw(pars: Fayde.IEventBindingArgs<Fayde.WebGL.WebGLDrawEventArgs>) {
         var gl = pars.args.gl;
@@ -70,10 +77,10 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
         var colors = [
-            1.0,  1.0,  1.0,  1.0,    // white
-            1.0,  0.0,  0.0,  1.0,    // red
-            0.0,  1.0,  0.0,  1.0,    // green
-            0.0,  0.0,  1.0,  1.0     // blue
+            1.0, 1.0, 1.0, 1.0,    // white
+            1.0, 0.0, 0.0, 1.0,    // red
+            0.0, 1.0, 0.0, 1.0,    // green
+            0.0, 0.0, 1.0, 1.0     // blue
         ];
         var squareVerticesColorBuffer = this.$squarecolorbuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesColorBuffer);
@@ -86,12 +93,57 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         var persp = mat4.createPerspective(45, width / height, 0.1, 100.0);
         var xform = mat4.createTranslate(-0.0, 0.0, -6.0);
 
+        xform = this.pushMatrix(xform);
+        xform = this.moveSquare(xform);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.$squarevertbuffer);
         gl.vertexAttribPointer(this.$vertposattr, 3, gl.FLOAT, false, 0, 0);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.$squarecolorbuffer);
         gl.vertexAttribPointer(this.$vertexcolorattr, 4, gl.FLOAT, false, 0, 0);
         setMatrixUniforms(gl, this.$program, persp, xform);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        xform = this.popMatrix();
+    }
+
+    private moveSquare(xform: number[]): number[] {
+        var now = Date.now();
+        var delta = !this.$last ? 0 : now - this.$last;
+        this.$last = now;
+
+        var pos = this.$squarepos;
+        var vel = this.$squarevel;
+        pos[0] += vel[0] * ((30 * delta) / 1000.0);
+        pos[1] += vel[1] * ((30 * delta) / 1000.0);
+        pos[2] += vel[2] * ((30 * delta) / 1000.0);
+
+        if (Math.abs(pos[1]) > 2.5) {
+            vel[0] = -vel[0];
+            vel[1] = -vel[1];
+            vel[2] = -vel[2];
+        }
+
+        this.$squarerot += (30 * delta) / 1000.0;
+        var rotrad = this.$squarerot * Math.PI / 180.0;
+
+        mat4.multiply(mat4.createRotateX(rotrad), xform, xform);
+        mat4.multiply(mat4.createRotateZ(rotrad), xform, xform);
+        mat4.multiply(mat4.createTranslate(pos[0], pos[1], pos[2]), xform, xform);
+
+        return xform;
+    }
+
+    private pushMatrix(mat: number[]): number[] {
+        this.$xstack.push(<Float32Array><any>mat);
+        return mat4.create(mat);
+    }
+
+    private popMatrix(): number[] {
+        if (this.$xstack.length > 0) {
+            return <number[]><any>this.$xstack.pop();
+        }
+        console.error("Can't pop from empty stack.");
+        return null;
     }
 }
 
