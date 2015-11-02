@@ -28,7 +28,7 @@ var fs = require('fs'),
                 src: [
                     'typings/*.d.ts',
                     'testsite/**/*.ts',
-                    'testsite/!(lib)/*.ts',
+                    '!testsite/lib/**/*.ts',
                     'dist/' + name + '.d.ts'
                 ].concat(allTypings)
             }

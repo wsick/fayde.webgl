@@ -1,6 +1,7 @@
 import basicFragment = require('text!../shaders/basic-fragment.shader');
 import basicVertex = require('text!../shaders/basic-vertex.shader');
 import Square = require('./Basic/Square');
+import Cube = require('./Basic/Cube');
 
 // Built from tutorial:
 //  https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL
@@ -12,6 +13,7 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
     private $last: number = 0;
 
     private $square = new Square();
+    private $cube = new Cube();
 
     onDraw(pars: Fayde.IEventBindingArgs<Fayde.WebGL.WebGLDrawEventArgs>) {
         var gl = pars.args.gl;
@@ -52,33 +54,37 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         gl.useProgram(shaderProgram);
 
         this.$square.initShaders(gl, shaderProgram);
+        this.$cube.initShaders(gl, shaderProgram);
     }
 
     private initBuffers(gl: WebGLRenderingContext) {
         this.$square.initBuffers(gl);
+        this.$cube.initBuffers(gl);
     }
 
     private draw(gl: WebGLRenderingContext, width: number, height: number) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        var persp = mat4.createPerspective(45, width / height, 0.1, 100.0);
-        var xform = mat4.createTranslate(-0.0, 0.0, -6.0);
-
-        xform = this.pushMatrix(xform);
-
-        xform = this.move(xform);
-        setMatrixUniforms(gl, this.$program, persp, xform);
-        this.$square.draw(gl);
-
-        xform = this.popMatrix();
-    }
-
-    private move(xform: number[]): number[] {
         var now = Date.now();
         var delta = !this.$last ? 0 : now - this.$last;
         this.$last = now;
 
-        return this.$square.move(delta, xform);
+        var persp = mat4.createPerspective(45, width / height, 0.1, 100.0);
+        var xform = mat4.createTranslate(-0.0, 0.0, -6.0);
+
+        /*
+        xform = this.pushMatrix(xform);
+        xform = this.$square.move(delta, xform);
+        setMatrixUniforms(gl, this.$program, persp, xform);
+        this.$square.draw(gl);
+        xform = this.popMatrix();
+        */
+
+        xform = this.pushMatrix(xform);
+        xform = this.$cube.move(delta, xform);
+        setMatrixUniforms(gl, this.$program, persp, xform);
+        this.$cube.draw(gl);
+        xform = this.popMatrix();
     }
 
     private pushMatrix(mat: number[]): number[] {
