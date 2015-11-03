@@ -1,3 +1,5 @@
+import createVideo = require('./createVideo');
+
 class Cube {
     private $angle = 0;
 
@@ -12,6 +14,7 @@ class Cube {
 
     private $texture: WebGLTexture;
     private $textureLoaded = false;
+    private $video: HTMLVideoElement;
 
     initShaders(gl: WebGLRenderingContext, shaderProgram: WebGLProgram) {
         gl.enableVertexAttribArray(this.$vertNormalAttr = gl.getAttribLocation(shaderProgram, "aVertexNormal"));
@@ -117,40 +120,40 @@ class Cube {
 
         var vertexNormals = [
             // Front
-            0.0,  0.0,  1.0,
-            0.0,  0.0,  1.0,
-            0.0,  0.0,  1.0,
-            0.0,  0.0,  1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
 
             // Back
-            0.0,  0.0, -1.0,
-            0.0,  0.0, -1.0,
-            0.0,  0.0, -1.0,
-            0.0,  0.0, -1.0,
+            0.0, 0.0, -1.0,
+            0.0, 0.0, -1.0,
+            0.0, 0.0, -1.0,
+            0.0, 0.0, -1.0,
 
             // Top
-            0.0,  1.0,  0.0,
-            0.0,  1.0,  0.0,
-            0.0,  1.0,  0.0,
-            0.0,  1.0,  0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
 
             // Bottom
-            0.0, -1.0,  0.0,
-            0.0, -1.0,  0.0,
-            0.0, -1.0,  0.0,
-            0.0, -1.0,  0.0,
+            0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, -1.0, 0.0,
 
             // Right
-            1.0,  0.0,  0.0,
-            1.0,  0.0,  0.0,
-            1.0,  0.0,  0.0,
-            1.0,  0.0,  0.0,
+            1.0, 0.0, 0.0,
+            1.0, 0.0, 0.0,
+            1.0, 0.0, 0.0,
+            1.0, 0.0, 0.0,
 
             // Left
-            -1.0,  0.0,  0.0,
-            -1.0,  0.0,  0.0,
-            -1.0,  0.0,  0.0,
-            -1.0,  0.0,  0.0
+            -1.0, 0.0, 0.0,
+            -1.0, 0.0, 0.0,
+            -1.0, 0.0, 0.0,
+            -1.0, 0.0, 0.0
         ];
         var verticesNormalBuffer = this.$vertNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, verticesNormalBuffer);
@@ -158,18 +161,14 @@ class Cube {
     }
 
     initTextures(gl: WebGLRenderingContext) {
+        var video = this.$video = createVideo("videos/Firefox.ogv", () => this.$textureLoaded = true);
+
         this.$texture = gl.createTexture();
-        var img = new Image();
-        img.onload = () => {
-            gl.bindTexture(gl.TEXTURE_2D, this.$texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
-            gl.bindTexture(gl.TEXTURE_2D, null);
-            this.$textureLoaded = true;
-        };
-        img.src = "textures/cube.png";
+        gl.bindTexture(gl.TEXTURE_2D, this.$texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
 
     move(delta: number, xform: number[]): number[] {
@@ -185,6 +184,8 @@ class Cube {
     draw(gl: WebGLRenderingContext, program: WebGLProgram) {
         if (!this.$textureLoaded)
             return;
+        this.updateTexture(gl);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.$vertbuffer);
         gl.vertexAttribPointer(this.$vertPosAttr, 3, gl.FLOAT, false, 0, 0);
 
@@ -200,6 +201,12 @@ class Cube {
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.$vertindexbuffer);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+    }
+
+    updateTexture(gl: WebGLRenderingContext) {
+        gl.bindTexture(gl.TEXTURE_2D, this.$texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, <any>true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.$video);
     }
 }
 export = Cube;
