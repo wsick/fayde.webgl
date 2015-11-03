@@ -31,6 +31,7 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         this.initShaders(gl);
         this.initBuffers(gl);
+        this.initTextures(gl);
         this.$initialized = true;
     }
 
@@ -58,6 +59,10 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         this.$cube.initBuffers(gl);
     }
 
+    private initTextures(gl: WebGLRenderingContext) {
+        this.$cube.initTextures(gl);
+    }
+
     private draw(gl: WebGLRenderingContext, width: number, height: number) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -71,7 +76,7 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         xform = this.pushMatrix(xform);
         xform = this.$cube.move(delta, xform);
         setMatrixUniforms(gl, this.$program, persp, xform);
-        this.$cube.draw(gl);
+        this.$cube.draw(gl, this.$program);
         xform = this.popMatrix();
     }
 
