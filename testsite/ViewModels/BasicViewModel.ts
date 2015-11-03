@@ -1,6 +1,5 @@
 import basicFragment = require('text!../shaders/basic-fragment.shader');
 import basicVertex = require('text!../shaders/basic-vertex.shader');
-import Square = require('./Basic/Square');
 import Cube = require('./Basic/Cube');
 
 // Built from tutorial:
@@ -12,7 +11,6 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
 
     private $last: number = 0;
 
-    private $square = new Square();
     private $cube = new Cube();
 
     onDraw(pars: Fayde.IEventBindingArgs<Fayde.WebGL.WebGLDrawEventArgs>) {
@@ -53,12 +51,10 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
 
         gl.useProgram(shaderProgram);
 
-        this.$square.initShaders(gl, shaderProgram);
         this.$cube.initShaders(gl, shaderProgram);
     }
 
     private initBuffers(gl: WebGLRenderingContext) {
-        this.$square.initBuffers(gl);
         this.$cube.initBuffers(gl);
     }
 
@@ -71,14 +67,6 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
 
         var persp = mat4.createPerspective(45, width / height, 0.1, 100.0);
         var xform = mat4.createTranslate(-0.0, 0.0, -6.0);
-
-        /*
-        xform = this.pushMatrix(xform);
-        xform = this.$square.move(delta, xform);
-        setMatrixUniforms(gl, this.$program, persp, xform);
-        this.$square.draw(gl);
-        xform = this.popMatrix();
-        */
 
         xform = this.pushMatrix(xform);
         xform = this.$cube.move(delta, xform);
