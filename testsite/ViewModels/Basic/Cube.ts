@@ -5,13 +5,16 @@ class Cube {
     private $colorbuffer: WebGLBuffer;
     private $vertindexbuffer: WebGLBuffer;
     private $textureBuffer: WebGLBuffer;
+    private $vertNormalBuffer: WebGLBuffer;
     private $vertPosAttr: number;
     private $vertTextureAttr: number;
+    private $vertNormalAttr: number;
 
     private $texture: WebGLTexture;
     private $textureLoaded = false;
 
     initShaders(gl: WebGLRenderingContext, shaderProgram: WebGLProgram) {
+        gl.enableVertexAttribArray(this.$vertNormalAttr = gl.getAttribLocation(shaderProgram, "aVertexNormal"));
         gl.enableVertexAttribArray(this.$vertPosAttr = gl.getAttribLocation(shaderProgram, "aVertexPosition"));
         gl.enableVertexAttribArray(this.$vertTextureAttr = gl.getAttribLocation(shaderProgram, "aTextureCoord"));
     }
@@ -110,6 +113,48 @@ class Cube {
         var verticesIndexBuffer = this.$vertindexbuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, verticesIndexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+
+
+        var vertexNormals = [
+            // Front
+            0.0,  0.0,  1.0,
+            0.0,  0.0,  1.0,
+            0.0,  0.0,  1.0,
+            0.0,  0.0,  1.0,
+
+            // Back
+            0.0,  0.0, -1.0,
+            0.0,  0.0, -1.0,
+            0.0,  0.0, -1.0,
+            0.0,  0.0, -1.0,
+
+            // Top
+            0.0,  1.0,  0.0,
+            0.0,  1.0,  0.0,
+            0.0,  1.0,  0.0,
+            0.0,  1.0,  0.0,
+
+            // Bottom
+            0.0, -1.0,  0.0,
+            0.0, -1.0,  0.0,
+            0.0, -1.0,  0.0,
+            0.0, -1.0,  0.0,
+
+            // Right
+            1.0,  0.0,  0.0,
+            1.0,  0.0,  0.0,
+            1.0,  0.0,  0.0,
+            1.0,  0.0,  0.0,
+
+            // Left
+            -1.0,  0.0,  0.0,
+            -1.0,  0.0,  0.0,
+            -1.0,  0.0,  0.0,
+            -1.0,  0.0,  0.0
+        ];
+        var verticesNormalBuffer = this.$vertNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, verticesNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
     }
 
     initTextures(gl: WebGLRenderingContext) {
@@ -145,6 +190,9 @@ class Cube {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.$textureBuffer);
         gl.vertexAttribPointer(this.$vertTextureAttr, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.$vertNormalBuffer);
+        gl.vertexAttribPointer(this.$vertNormalAttr, 3, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.$texture);

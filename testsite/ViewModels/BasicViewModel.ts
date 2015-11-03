@@ -111,6 +111,12 @@ function setMatrixUniforms(gl: WebGLRenderingContext, program: WebGLProgram, per
 
     var mvUniform = gl.getUniformLocation(program, "uMVMatrix");
     gl.uniformMatrix4fv(mvUniform, false, <Float32Array><any>xform);
+
+    var normal = mat4.create(xform);
+    mat4.inverse(normal);
+    mat4.transpose(normal);
+    var nUniform = gl.getUniformLocation(program, "uNormalMatrix");
+    gl.uniformMatrix4fv(nUniform, false, new Float32Array(normal));
 }
 
 export = BasicViewModel;
