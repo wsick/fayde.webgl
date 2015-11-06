@@ -48,15 +48,15 @@ module Fayde.WebGL {
             if (this.$loadStatus === LoadStatus.Loaded)
                 return Promise.resolve(this);
             if (this.$loadStatus === LoadStatus.LoadFailed)
-                return Promise.reject<ShaderBase>(this.$loadErr);
+                return Promise.reject<IShader>(this.$loadErr);
 
             var uri = this.Uri;
             if (Uri.isNullOrEmpty(uri))
-                return Promise.reject<ShaderBase>("Cannot load shader if no Uri is specified.");
+                return Promise.reject<IShader>("Cannot load shader if no Uri is specified.");
 
             this.$loadStatus = LoadStatus.Loading;
             this.$loadErr = null;
-            return new Promise<ShaderBase>((resolve, reject) => {
+            return new Promise<IShader>((resolve, reject) => {
                 (<any>require)(['text!' + this.Uri], (src) => {
                     this.SetCurrentValue(ShaderBase.SourceProperty, src);
                     resolve(this);

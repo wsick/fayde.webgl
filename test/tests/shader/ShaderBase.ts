@@ -1,7 +1,23 @@
 import VertexShader = Fayde.WebGL.VertexShader;
+import FragmentShader = Fayde.WebGL.FragmentShader;
+import Uri = Fayde.Uri;
 
 export function load() {
     QUnit.module("shader:ShaderBase");
+
+    QUnit.test("conversion", () => {
+        var shader = nullstone.convertAnyToType(new Uri("shaders/basic-vertex.shader"), VertexShader);
+        ok(shader instanceof VertexShader);
+        strictEqual(shader.IsLoaded, false);
+        notEqual(shader.Uri, null);
+        strictEqual(shader.Uri.toString(), "shaders/basic-vertex.shader");
+
+        var shader = nullstone.convertAnyToType(new Uri("shaders/basic-fragment.shader"), FragmentShader);
+        ok(shader instanceof FragmentShader);
+        strictEqual(shader.IsLoaded, false);
+        notEqual(shader.Uri, null);
+        strictEqual(shader.Uri.toString(), "shaders/basic-fragment.shader");
+    });
 
     QUnit.test("set Source", () => {
         var shader = new VertexShader();
@@ -14,7 +30,7 @@ export function load() {
 
     QUnit.asyncTest("load", () => {
         var shader = new VertexShader();
-        shader.Uri = new Fayde.Uri("shaders/basic-vertex.shader");
+        shader.Uri = new Uri("shaders/basic-vertex.shader");
         shader.load()
             .then(() => {
                 QUnit.start();

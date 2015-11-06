@@ -1,4 +1,16 @@
+/// <reference path="FragmentShader" />
+/// <reference path="VertexShader" />
+
 module Fayde.WebGL {
+    nullstone.registerTypeConverter(FragmentShader, (value: any): any => {
+        if (!value)
+            return value;
+        if (value instanceof FragmentShader)
+            return value;
+        var shader = new FragmentShader();
+        fillShader(shader, value);
+        return shader;
+    });
     nullstone.registerTypeConverter(VertexShader, (value: any): any => {
         if (!value)
             return value;
@@ -9,15 +21,6 @@ module Fayde.WebGL {
         return shader;
 
 
-    });
-    nullstone.registerTypeConverter(FragmentShader, (value: any): any => {
-        if (!value)
-            return value;
-        if (value instanceof FragmentShader)
-            return value;
-        var shader = new FragmentShader();
-        fillShader(shader, value);
-        return shader;
     });
 
     function fillShader(shader: ShaderBase, value: any) {
