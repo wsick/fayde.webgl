@@ -73,7 +73,7 @@ module Fayde.WebGL {
             var src = this.Source;
             if (!src)
                 return false;
-            var shader = this.$shader = gl.createShader(gl.VERTEX_SHADER);
+            var shader = this.$shader = gl.createShader(this.getType(gl));
             gl.shaderSource(shader, src);
             gl.compileShader(shader);
             if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
