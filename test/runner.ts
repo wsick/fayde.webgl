@@ -1,7 +1,7 @@
 module runner {
     var libpath = "lib/fayde.webgl/dist/fayde.webgl";
     var testModules = [
-        ".build/tests/test1"
+        ".build/tests/shader/ShaderBase"
     ];
 
     Fayde.LoadConfigJson((config, err) => {

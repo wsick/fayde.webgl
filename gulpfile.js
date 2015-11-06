@@ -15,8 +15,8 @@ var fs = require('fs'),
                 symdirs: ['dist', 'src', 'themes'],
                 src: [
                     'typings/*.d.ts',
-                    'test/*.ts',
-                    'test/!(lib)/*.ts',
+                    'test/**/*.ts',
+                    '!test/lib/**/*.ts',
                     'dist/' + name + '.d.ts'
                 ].concat(allTypings)
             },
