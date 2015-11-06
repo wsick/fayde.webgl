@@ -1,4 +1,5 @@
 module Fayde.WebGL {
+    import ShapeArrangePipeDef = minerva.shapes.shape.arrange.ShapeArrangePipeDef;
     enum LoadStatus {
         NotLoaded = 0,
         Loaded = 1,
@@ -9,8 +10,10 @@ module Fayde.WebGL {
     export class ShaderBase extends DependencyObject implements IShader {
         static SourceProperty = DependencyProperty.Register("Source", () => String, ShaderBase, undefined, (d: ShaderBase, args) => d.OnSourceChanged(args.OldValue, args.NewValue));
         static UriProperty = DependencyProperty.Register("Uri", () => Uri, ShaderBase, undefined, (d: ShaderBase, args) => d.OnUriChanged(args.OldValue, args.NewValue));
+        static IsLoadedProperty = DependencyProperty.Register("IsLoaded", () => Boolean, ShaderBase, false);
         Source: string;
         Uri: Uri;
+        IsLoaded: boolean;
 
         protected $shader: WebGLShader = null;
         private $loadStatus = LoadStatus.NotLoaded;
@@ -19,10 +22,16 @@ module Fayde.WebGL {
 
         protected OnSourceChanged(oldSource: string, newSource: string) {
             this.$compiled = false;
-            if (this.$loadStatus === LoadStatus.Loading)
-                return;
-            this.SetCurrentValue(ShaderBase.UriProperty, undefined);
-            this.$loadStatus = LoadStatus.Loaded;
+            if (this.$loadStatus !== LoadStatus.Loading) {
+                this.SetCurrentValue(ShaderBase.UriProperty, undefined);
+            }
+            if (!newSource) {
+                this.$loadStatus = LoadStatus.NotLoaded;
+                this.SetCurrentValue(ShaderBase.IsLoadedProperty, false);
+            } else {
+                this.$loadStatus = LoadStatus.Loaded;
+                this.SetCurrentValue(ShaderBase.IsLoadedProperty, true);
+            }
         }
 
         protected OnUriChanged(oldUri: Uri, newUri: Uri) {
@@ -50,7 +59,6 @@ module Fayde.WebGL {
             return new Promise<ShaderBase>((resolve, reject) => {
                 (<any>require)(['text!' + this.Uri], (src) => {
                     this.SetCurrentValue(ShaderBase.SourceProperty, src);
-                    this.$loadStatus = LoadStatus.Loaded;
                     resolve(this);
                 }, (err) => {
                     this.$loadStatus = LoadStatus.LoadFailed;
