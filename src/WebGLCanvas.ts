@@ -19,17 +19,17 @@ module Fayde.WebGL {
             if (oldSource)
                 oldSource.detach();
             if (newSource) {
-                newSource.attach((gl, program) => this.OnInit(gl, program),
-                    (gl, program, width, height) => this.OnDraw(gl, program, width, height));
+                newSource.attach((rend) => this.OnInit(rend),
+                    (rend) => this.OnDraw(rend));
             }
         }
 
-        protected OnInit(gl: WebGLRenderingContext, program: WebGLProgram) {
-            this.Init.raise(this, new WebGLInitEventArgs(gl, program));
+        protected OnInit(rend: WebGLRenderer) {
+            this.Init.raise(this, new WebGLInitEventArgs(rend));
         }
 
-        protected OnDraw(gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number) {
-            this.Draw.raise(this, new WebGL.WebGLDrawEventArgs(gl, program, width, height));
+        protected OnDraw(rend: WebGLRenderer) {
+            this.Draw.raise(this, new WebGL.WebGLDrawEventArgs(rend));
         }
     }
     Fayde.CoreLibrary.add(WebGLCanvas);

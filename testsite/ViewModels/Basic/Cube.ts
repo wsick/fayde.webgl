@@ -181,9 +181,11 @@ class Cube {
         return xform;
     }
 
-    draw(gl: WebGLRenderingContext, program: WebGLProgram) {
+    draw(rend: Fayde.WebGL.WebGLRenderer) {
         if (!this.$textureLoaded)
             return;
+        var gl = rend.gl;
+        var program = rend.program;
         this.updateTexture(gl);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.$vertbuffer);

@@ -1,6 +1,7 @@
 import basicFragment = require('text!../shaders/basic-fragment.shader');
 import basicVertex = require('text!../shaders/basic-vertex.shader');
 import Cube = require('./Basic/Cube');
+import WebGLRenderer = Fayde.WebGL.WebGLRenderer;
 
 // Built from tutorial:
 //  https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL
@@ -13,8 +14,9 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
     private $cube = new Cube();
 
     onInit(pars: Fayde.IEventBindingArgs<Fayde.WebGL.WebGLInitEventArgs>) {
-        var gl = pars.args.gl;
-        var program = pars.args.program;
+        var rend = pars.args.rend;
+        var gl = rend.gl;
+        var program = rend.program;
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
@@ -38,28 +40,22 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
     }
 
     onDraw(pars: Fayde.IEventBindingArgs<Fayde.WebGL.WebGLDrawEventArgs>) {
-        var gl = pars.args.gl;
-        var program = pars.args.program;
-        var w = pars.args.width;
-        var h = pars.args.height;
-        gl.viewport(0, 0, w, h);
-        this.draw(gl, program, w, h);
-    }
-
-    private draw(gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number) {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        var rend = pars.args.rend;
+        var gl = rend.gl;
 
         var now = Date.now();
         var delta = !this.$last ? 0 : now - this.$last;
         this.$last = now;
 
-        var persp = mat4.createPerspective(45, width / height, 0.1, 100.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        var persp = mat4.createPerspective(45, rend.width / rend.height, 0.1, 100.0);
         var xform = mat4.createTranslate(-0.0, 0.0, -6.0);
 
         xform = this.pushMatrix(xform);
         xform = this.$cube.move(delta, xform);
-        setMatrixUniforms(gl, program, persp, xform);
-        this.$cube.draw(gl, program);
+        setMatrixUniforms(rend, persp, xform);
+        this.$cube.draw(rend);
         xform = this.popMatrix();
     }
 
@@ -77,18 +73,10 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
     }
 }
 
-function createShader(gl: WebGLRenderingContext, content: string, type: number): WebGLShader {
-    var shader = gl.createShader(type);
-    gl.shaderSource(shader, content);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error("An error occurred compiling the shaders.", gl.getShaderInfoLog(shader));
-        return null;
-    }
-    return shader;
-}
+function setMatrixUniforms(rend: Fayde.WebGL.WebGLRenderer, persp: number[], xform: number[]) {
+    var gl = rend.gl;
+    var program  = rend.program;
 
-function setMatrixUniforms(gl: WebGLRenderingContext, program: WebGLProgram, persp: number[], xform: number[]) {
     var pUniform = gl.getUniformLocation(program, "uPMatrix");
     gl.uniformMatrix4fv(pUniform, false, <Float32Array><any>persp);
 
