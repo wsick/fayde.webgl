@@ -9,8 +9,10 @@ module Fayde.WebGL {
     export class WebGLSource extends DependencyObject implements fayde.webgl.updater.IWebGLSource {
         static VertexShaderProperty = DependencyProperty.Register("VertexShader", () => VertexShader, WebGLSource, undefined, (d: WebGLSource, args) => d.OnVertexShaderChanged(args.OldValue, args.NewValue));
         static FragmentShaderProperty = DependencyProperty.Register("FragmentShader", () => FragmentShader, WebGLSource, undefined, (d: WebGLSource, args) => d.OnFragmentShaderChanged(args.OldValue, args.NewValue));
+        static AttributesProperty = DependencyProperty.RegisterImmutable("Attributes", () => Fayde.XamlObjectCollection, WebGLSource);
         VertexShader: VertexShader;
         FragmentShader: FragmentShader;
+        Attributes: XamlObjectCollection<WebGLAttribute>;
 
         private $renderer = new WebGLRenderer();
         private $loaded = false;
@@ -31,6 +33,11 @@ module Fayde.WebGL {
                     .then(() => this.$tryLoad(),
                         err => console.error("Could not load fragment shader.", err));
             }
+        }
+
+        constructor() {
+            super();
+            WebGLSource.AttributesProperty.Initialize(this);
         }
 
         private $tryLoad() {

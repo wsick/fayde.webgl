@@ -1,10 +1,20 @@
 module Fayde.WebGL {
+    export interface IAttributeAssetsMap {
+        [name: string]: IAsset;
+    }
+
     export class WebGLRenderer {
         gl: WebGLRenderingContext;
         program: WebGLProgram;
+        private $source: WebGLSource;
 
-        get width(): number { return this.gl.canvas.width; }
-        get height(): number { return this.gl.canvas.height; }
+        get width(): number {
+            return this.gl.canvas.width;
+        }
+
+        get height(): number {
+            return this.gl.canvas.height;
+        }
 
         constructor() {
             var canvas = document.createElement('canvas');
@@ -15,16 +25,10 @@ module Fayde.WebGL {
                     writable: false
                 },
                 "program": {
-                    value: gl.createProgram(),
+                    value: gl ? gl.createProgram() : null,
                     writable: false
                 }
             });
-        }
-
-        load(source: WebGLSource): WebGLRenderer {
-            return this
-                .initShaders(source)
-                .initProgram();
         }
 
         resize(width: number, height: number): WebGLRenderer {
@@ -35,13 +39,31 @@ module Fayde.WebGL {
             return this;
         }
 
+        load(source: WebGLSource): WebGLRenderer {
+            this.$source = source;
+            return this
+                .initShaders()
+                .initProgram()
+                .initAttributes()
+                .initUniforms();
+        }
+
+        bindAttributes(assets: IAttributeAssetsMap): WebGLRenderer {
+            for (var en = this.$source.Attributes.getEnumerator(); en.moveNext();) {
+                var asset = assets[en.current.Name];
+                asset.bindAttribute(this, en.current);
+            }
+            return this;
+        }
+
         draw(ctx: CanvasRenderingContext2D): WebGLRenderer {
             ctx.drawImage(this.gl.canvas, 0, 0);
             return this;
         }
 
-        protected initShaders(source: WebGLSource): WebGLRenderer {
+        protected initShaders(): WebGLRenderer {
             var gl = this.gl;
+            var source = this.$source;
 
             var vs = source.VertexShader;
             vs.compile(gl);
@@ -63,6 +85,17 @@ module Fayde.WebGL {
                 return this;
             }
             gl.useProgram(program);
+            return this;
+        }
+
+        protected initAttributes(): WebGLRenderer {
+            for (var en = this.$source.Attributes.getEnumerator(); en.moveNext();) {
+                en.current.init(this);
+            }
+            return this;
+        }
+
+        protected initUniforms(): WebGLRenderer {
             return this;
         }
     }

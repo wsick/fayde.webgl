@@ -35,7 +35,7 @@ export function load() {
             .then(() => {
                 QUnit.start();
                 notEqual(shader.Source, null);
-                strictEqual(shader.Source.length, 837);
+                strictEqual(shader.Source.length, 812);
                 strictEqual(shader.IsLoaded, true);
             }, (err) => {
                 QUnit.start();

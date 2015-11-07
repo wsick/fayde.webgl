@@ -9,6 +9,11 @@
         </Grid.DataContext>
         <webgl:WebGLCanvas Init="{EventBinding onInit}" Draw="{EventBinding onDraw}">
             <webgl:WebGLSource VertexShader="shaders/basic-vertex.shader" FragmentShader="shaders/basic-fragment.shader">
+                <webgl:WebGLSource.Attributes>
+                    <webgl:WebGLAttribute Name="aVertexNormal" />
+                    <webgl:WebGLAttribute Name="aVertexPosition" />
+                    <webgl:WebGLAttribute Name="aTextureCoord" />
+                </webgl:WebGLSource.Attributes>
             </webgl:WebGLSource>
         </webgl:WebGLCanvas>
     </Grid>

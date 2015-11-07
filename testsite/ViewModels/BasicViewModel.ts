@@ -22,17 +22,12 @@ class BasicViewModel extends Fayde.MVVM.ViewModelBase {
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        this.initShaders(gl, program);
-        this.initBuffers(gl);
+        this.initBuffers(rend);
         this.initTextures(gl);
     }
 
-    private initShaders(gl: WebGLRenderingContext, shaderProgram: WebGLProgram) {
-        this.$cube.initShaders(gl, shaderProgram);
-    }
-
-    private initBuffers(gl: WebGLRenderingContext) {
-        this.$cube.initBuffers(gl);
+    private initBuffers(rend: Fayde.WebGL.WebGLRenderer) {
+        this.$cube.initBuffers(rend);
     }
 
     private initTextures(gl: WebGLRenderingContext) {

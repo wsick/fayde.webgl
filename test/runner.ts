@@ -1,6 +1,7 @@
 module runner {
     var libpath = "lib/fayde.webgl/dist/fayde.webgl";
     var testModules = [
+        ".build/tests/assets/ArrayAsset",
         ".build/tests/shader/ShaderBase"
     ];
 
