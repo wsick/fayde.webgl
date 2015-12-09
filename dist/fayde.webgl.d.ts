@@ -37,26 +37,32 @@ declare module Fayde.WebGL {
     interface IDrawEvent {
         (gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number): any;
     }
-    class WebGLSource extends DependencyObject implements fayde.webgl.updater.IWebGLSource {
-        static VertexShaderProperty: DependencyProperty;
-        static FragmentShaderProperty: DependencyProperty;
-        VertexShader: VertexShader;
-        FragmentShader: FragmentShader;
-        private $gl;
-        private $program;
-        private $loaded;
-        private $onInit;
+    class WebGLSourceBase extends DependencyObject implements fayde.webgl.updater.IWebGLSource {
+        protected $gl: WebGLRenderingContext;
+        protected $program: WebGLProgram;
+        protected $loaded: boolean;
+        protected $onInit: IInitEvent;
         private $onDraw;
-        protected OnVertexShaderChanged(oldShader: VertexShader, newShader: VertexShader): void;
-        protected OnFragmentShaderChanged(oldShader: FragmentShader, newShader: FragmentShader): void;
         constructor();
         private $setElement(element);
-        private $tryLoad();
+        protected $tryLoad(): void;
         resize(width: number, height: number): void;
         init(gl: WebGLRenderingContext, program: WebGLProgram): void;
         draw(ctx: CanvasRenderingContext2D): void;
         detach(): void;
         attach(onInit: IInitEvent, onDraw: IDrawEvent): void;
+    }
+}
+declare module Fayde.WebGL {
+    class WebGLSource extends WebGLSourceBase {
+        static VertexShaderProperty: DependencyProperty;
+        static FragmentShaderProperty: DependencyProperty;
+        VertexShader: VertexShader;
+        FragmentShader: FragmentShader;
+        protected OnVertexShaderChanged(oldShader: VertexShader, newShader: VertexShader): void;
+        protected OnFragmentShaderChanged(oldShader: FragmentShader, newShader: FragmentShader): void;
+        protected $tryLoad(): void;
+        init(gl: WebGLRenderingContext, program: WebGLProgram): void;
     }
 }
 declare module Fayde.WebGL {

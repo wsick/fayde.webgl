@@ -2,7 +2,7 @@ var Fayde;
 (function (Fayde) {
     var WebGL;
     (function (WebGL) {
-        WebGL.version = '0.1.0';
+        WebGL.version = '0.1.1';
     })(WebGL = Fayde.WebGL || (Fayde.WebGL = {}));
 })(Fayde || (Fayde = {}));
 var __extends = (this && this.__extends) || function (d, b) {
@@ -91,12 +91,62 @@ var Fayde;
 (function (Fayde) {
     var WebGL;
     (function (WebGL) {
-        var WebGLSource = (function (_super) {
-            __extends(WebGLSource, _super);
-            function WebGLSource() {
+        var WebGLSourceBase = (function (_super) {
+            __extends(WebGLSourceBase, _super);
+            function WebGLSourceBase() {
                 _super.call(this);
                 this.$loaded = false;
                 this.$setElement(document.createElement('canvas'));
+                this.$tryLoad();
+            }
+            WebGLSourceBase.prototype.$setElement = function (element) {
+                this.$gl = (element.getContext("webgl") || element.getContext("experimental-webgl"));
+                this.$tryLoad();
+            };
+            WebGLSourceBase.prototype.$tryLoad = function () {
+                if (!!this.$loaded)
+                    return;
+                this.init(this.$gl, this.$program = this.$gl.createProgram());
+                this.$loaded = true;
+            };
+            WebGLSourceBase.prototype.resize = function (width, height) {
+                var canvas = this.$gl.canvas;
+                this.$gl.viewport(0, 0, width, height);
+                canvas.width = width;
+                canvas.height = height;
+            };
+            WebGLSourceBase.prototype.init = function (gl, program) {
+                this.$onInit && this.$onInit(gl, program);
+            };
+            WebGLSourceBase.prototype.draw = function (ctx) {
+                if (!this.$loaded)
+                    return;
+                var canvas = this.$gl.canvas;
+                this.$onDraw && this.$onDraw(this.$gl, this.$program, canvas.width, canvas.height);
+                ctx.drawImage(canvas, 0, 0);
+            };
+            WebGLSourceBase.prototype.detach = function () {
+                this.$onInit = null;
+                this.$onDraw = null;
+            };
+            WebGLSourceBase.prototype.attach = function (onInit, onDraw) {
+                this.$onInit = onInit;
+                this.$onDraw = onDraw;
+            };
+            return WebGLSourceBase;
+        })(Fayde.DependencyObject);
+        WebGL.WebGLSourceBase = WebGLSourceBase;
+    })(WebGL = Fayde.WebGL || (Fayde.WebGL = {}));
+})(Fayde || (Fayde = {}));
+/// <reference path="WebGLSourceBase" />
+var Fayde;
+(function (Fayde) {
+    var WebGL;
+    (function (WebGL) {
+        var WebGLSource = (function (_super) {
+            __extends(WebGLSource, _super);
+            function WebGLSource() {
+                _super.apply(this, arguments);
             }
             WebGLSource.prototype.OnVertexShaderChanged = function (oldShader, newShader) {
                 var _this = this;
@@ -112,9 +162,6 @@ var Fayde;
                         .then(function () { return _this.$tryLoad(); }, function (err) { return console.error("Could not load fragment shader.", err); });
                 }
             };
-            WebGLSource.prototype.$setElement = function (element) {
-                this.$gl = (element.getContext("webgl") || element.getContext("experimental-webgl"));
-            };
             WebGLSource.prototype.$tryLoad = function () {
                 if (!!this.$loaded)
                     return;
@@ -124,12 +171,6 @@ var Fayde;
                     return;
                 this.init(this.$gl, this.$program = this.$gl.createProgram());
                 this.$loaded = true;
-            };
-            WebGLSource.prototype.resize = function (width, height) {
-                var canvas = this.$gl.canvas;
-                this.$gl.viewport(0, 0, width, height);
-                canvas.width = width;
-                canvas.height = height;
             };
             WebGLSource.prototype.init = function (gl, program) {
                 var vs = this.VertexShader;
@@ -146,25 +187,10 @@ var Fayde;
                 gl.useProgram(program);
                 this.$onInit && this.$onInit(this.$gl, this.$program);
             };
-            WebGLSource.prototype.draw = function (ctx) {
-                if (!this.$loaded)
-                    return;
-                var canvas = this.$gl.canvas;
-                this.$onDraw && this.$onDraw(this.$gl, this.$program, canvas.width, canvas.height);
-                ctx.drawImage(canvas, 0, 0);
-            };
-            WebGLSource.prototype.detach = function () {
-                this.$onInit = null;
-                this.$onDraw = null;
-            };
-            WebGLSource.prototype.attach = function (onInit, onDraw) {
-                this.$onInit = onInit;
-                this.$onDraw = onDraw;
-            };
             WebGLSource.VertexShaderProperty = DependencyProperty.Register("VertexShader", function () { return WebGL.VertexShader; }, WebGLSource, undefined, function (d, args) { return d.OnVertexShaderChanged(args.OldValue, args.NewValue); });
             WebGLSource.FragmentShaderProperty = DependencyProperty.Register("FragmentShader", function () { return WebGL.FragmentShader; }, WebGLSource, undefined, function (d, args) { return d.OnFragmentShaderChanged(args.OldValue, args.NewValue); });
             return WebGLSource;
-        })(Fayde.DependencyObject);
+        })(WebGL.WebGLSourceBase);
         WebGL.WebGLSource = WebGLSource;
     })(WebGL = Fayde.WebGL || (Fayde.WebGL = {}));
 })(Fayde || (Fayde = {}));
