@@ -2,7 +2,7 @@ var Fayde;
 (function (Fayde) {
     var WebGL;
     (function (WebGL) {
-        WebGL.version = '0.1.1';
+        WebGL.version = '0.1.2';
     })(WebGL = Fayde.WebGL || (Fayde.WebGL = {}));
 })(Fayde || (Fayde = {}));
 var __extends = (this && this.__extends) || function (d, b) {
@@ -132,6 +132,8 @@ var Fayde;
             WebGLSourceBase.prototype.attach = function (onInit, onDraw) {
                 this.$onInit = onInit;
                 this.$onDraw = onDraw;
+                if (this.$loaded)
+                    this.init(this.$gl, this.$program);
             };
             return WebGLSourceBase;
         })(Fayde.DependencyObject);

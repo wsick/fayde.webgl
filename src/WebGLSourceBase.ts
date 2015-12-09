@@ -59,6 +59,8 @@ module Fayde.WebGL {
         attach(onInit: IInitEvent, onDraw: IDrawEvent) {
             this.$onInit = onInit;
             this.$onDraw = onDraw;
+            if (this.$loaded)
+                this.init(this.$gl, this.$program);
         }
     }
 }
