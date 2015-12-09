@@ -6,33 +6,96 @@ declare module Fayde.WebGL {
         CreateLayoutUpdater(): fayde.webgl.updater.WebGLCanvasUpdater;
         static SourceProperty: DependencyProperty;
         Source: WebGL.WebGLSource;
+        Init: nullstone.Event<WebGLInitEventArgs>;
         Draw: nullstone.Event<WebGLDrawEventArgs>;
         constructor();
         protected OnSourceChanged(oldSource: WebGL.WebGLSource, newSource: WebGL.WebGLSource): void;
-        protected OnDraw(gl: WebGLRenderingContext, width: number, height: number): void;
+        protected OnInit(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        protected OnDraw(gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number): void;
     }
 }
 declare module Fayde.WebGL {
     class WebGLDrawEventArgs implements nullstone.IEventArgs {
         gl: WebGLRenderingContext;
+        program: WebGLProgram;
         width: number;
         height: number;
-        constructor(gl: WebGLRenderingContext, width: number, height: number);
+        constructor(gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number);
     }
 }
 declare module Fayde.WebGL {
-    interface IDrawEvent {
-        (gl: WebGLRenderingContext, width: number, height: number): any;
+    class WebGLInitEventArgs implements nullstone.IEventArgs {
+        gl: WebGLRenderingContext;
+        program: WebGLProgram;
+        constructor(gl: WebGLRenderingContext, program: WebGLProgram);
     }
-    class WebGLSource implements fayde.webgl.updater.IWebGLSource {
-        private $element;
+}
+declare module Fayde.WebGL {
+    interface IInitEvent {
+        (gl: WebGLRenderingContext, program: WebGLProgram): any;
+    }
+    interface IDrawEvent {
+        (gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number): any;
+    }
+    class WebGLSource extends DependencyObject implements fayde.webgl.updater.IWebGLSource {
+        static VertexShaderProperty: DependencyProperty;
+        static FragmentShaderProperty: DependencyProperty;
+        VertexShader: VertexShader;
+        FragmentShader: FragmentShader;
         private $gl;
+        private $program;
+        private $loaded;
+        private $onInit;
         private $onDraw;
-        constructor($element: HTMLCanvasElement);
+        protected OnVertexShaderChanged(oldShader: VertexShader, newShader: VertexShader): void;
+        protected OnFragmentShaderChanged(oldShader: FragmentShader, newShader: FragmentShader): void;
+        constructor();
+        private $setElement(element);
+        private $tryLoad();
         resize(width: number, height: number): void;
+        init(gl: WebGLRenderingContext, program: WebGLProgram): void;
         draw(ctx: CanvasRenderingContext2D): void;
         detach(): void;
-        attach(onDraw: IDrawEvent): void;
+        attach(onInit: IInitEvent, onDraw: IDrawEvent): void;
+    }
+}
+declare module Fayde.WebGL {
+    class ShaderBase extends DependencyObject implements IShader {
+        static SourceProperty: DependencyProperty;
+        static UriProperty: DependencyProperty;
+        static IsLoadedProperty: DependencyProperty;
+        Source: string;
+        Uri: Uri;
+        IsLoaded: boolean;
+        protected $shader: WebGLShader;
+        private $loadStatus;
+        private $loadErr;
+        private $compiled;
+        protected OnSourceChanged(oldSource: string, newSource: string): void;
+        protected OnUriChanged(oldUri: Uri, newUri: Uri): void;
+        load(forceLoad?: boolean): Promise<IShader>;
+        compile(gl: WebGLRenderingContext): boolean;
+        use(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        protected getType(gl: WebGLRenderingContext): number;
+    }
+}
+declare module Fayde.WebGL {
+    class FragmentShader extends ShaderBase {
+        protected getType(gl: WebGLRenderingContext): number;
+    }
+}
+declare module Fayde.WebGL {
+    class VertexShader extends ShaderBase {
+        protected getType(gl: WebGLRenderingContext): number;
+    }
+}
+declare module Fayde.WebGL {
+}
+declare module Fayde.WebGL {
+    interface IShader {
+        load(forceLoad?: boolean): Promise<IShader>;
+        compile(gl: WebGLRenderingContext): boolean;
+        use(gl: WebGLRenderingContext, program: WebGLProgram): any;
     }
 }
 declare module fayde.webgl.updater {
