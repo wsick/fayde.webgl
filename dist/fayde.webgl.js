@@ -2,7 +2,7 @@ var Fayde;
 (function (Fayde) {
     var WebGL;
     (function (WebGL) {
-        WebGL.version = '0.1.2';
+        WebGL.version = '0.1.3';
     })(WebGL = Fayde.WebGL || (Fayde.WebGL = {}));
 })(Fayde || (Fayde = {}));
 var __extends = (this && this.__extends) || function (d, b) {
@@ -34,7 +34,13 @@ var Fayde;
                 }
             };
             WebGLCanvas.prototype.OnInit = function (gl, program) {
-                this.Init.raise(this, new WebGL.WebGLInitEventArgs(gl, program));
+                var _this = this;
+                if (this.XamlNode.IsAttached)
+                    this.Init.raise(this, new WebGL.WebGLInitEventArgs(gl, program));
+                var monitor = this.XamlNode.MonitorIsAttached(function (isAttached) {
+                    _this.OnInit(gl, program);
+                    monitor.Detach();
+                });
             };
             WebGLCanvas.prototype.OnDraw = function (gl, program, width, height) {
                 this.Draw.raise(this, new WebGL.WebGLDrawEventArgs(gl, program, width, height));

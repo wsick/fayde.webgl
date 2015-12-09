@@ -25,7 +25,13 @@ module Fayde.WebGL {
         }
 
         protected OnInit(gl: WebGLRenderingContext, program: WebGLProgram) {
-            this.Init.raise(this, new WebGLInitEventArgs(gl, program));
+            if (this.XamlNode.IsAttached)
+                this.Init.raise(this, new WebGLInitEventArgs(gl, program));
+            else
+                var monitor = this.XamlNode.MonitorIsAttached(isAttached => {
+                    this.OnInit(gl, program);
+                    monitor.Detach();
+                });
         }
 
         protected OnDraw(gl: WebGLRenderingContext, program: WebGLProgram, width: number, height: number) {
